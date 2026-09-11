@@ -28,3 +28,6 @@ Jenkins will be used for the CI/CD pipeline.
 ## Repository
 
 https://github.com/amankuntal5008/Project-ELARA
+
+## Application
+The project contains separate User and Admin applications for the ELARA system.
