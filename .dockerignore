@@ -1,0 +1,11 @@
+node_modules
+.git
+.gitignore
+.env
+npm-debug.log
+dist
+User/dist
+admin/dist
+docs/*.png
+docs/*.jpg
+k8s
