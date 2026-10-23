@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   hygiene:
     name: Repository hygiene
@@ -40,3 +44,44 @@ jobs:
 
       - name: Build applications
         run: make build
+
+  containerize-and-publish:
+    name: Containerize and push to GHCR
+    needs: [hygiene, build-and-test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image locally
+        run: docker build -t elara-practice .
+
+      - name: Run automated tests inside container
+        run: docker run --rm elara-practice node tests/basic.test.js
+
+      - name: Determine container image tag
+        id: image_tag
+        run: |
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "image=ghcr.io/${REPO_LOWER}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push to GitHub Container Registry
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.image_tag.outputs.image }}:latest
+            ${{ steps.image_tag.outputs.image }}:${{ github.sha }}
