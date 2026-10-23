@@ -1,68 +1,67 @@
 # Project ELARA
 
-Project ELARA is a full-stack web application with separate User and Admin applications, containerized with Docker, instrumented for monitoring with Prometheus and Grafana, and orchestrated on Kubernetes.
+> **Live Public URL (User Frontend):** https://projectelara-user.onrender.com
+
+Project ELARA is a full-stack healthcare service booking web application with separate User and Admin frontends backed by an Express application server, instrumented with Prometheus metrics and Grafana dashboards, and orchestrated with Kubernetes.
 
 ## Author
 
 | Roll No | Name | GitHub Username |
 |---|---|---|
-| 24ESKCS054 | Aman Kuntal | amankuntal5008 |
+| 24ESKCS039 | Aman Kuntal | amankuntal5008 |
 
 ## Live Deployment
 
-- **Live URL**: https://devops-24eskcs039.onrender.com
-- **Health Check**: https://devops-24eskcs039.onrender.com/health
-- **Prometheus Metrics**: https://devops-24eskcs039.onrender.com/metrics
+- **Live URL**: https://projectelara-user.onrender.com
+- **Health Check**: https://projectelara-user.onrender.com/health
+- **Prometheus Metrics**: https://projectelara-user.onrender.com/metrics
 
 ## Project Structure
 
-- `User/` - User client application (React + Vite)
-- `admin/` - Admin client application (React + Vite)
-- `server.js` - Production Express server serving frontends and Prometheus metrics
-- `Dockerfile` - Multi-stage container build for ELARA
-- `docker-compose.yml` - Multi-service local stack (App, Prometheus, Grafana)
-- `.github/workflows/ci.yml` - GitHub Actions CI/CD with automated testing and GHCR image publishing
-- `monitoring/` - Prometheus configuration, alerting rules, and Grafana dashboard JSON
-- `k8s/` - Kubernetes manifests (Deployment and NodePort Service)
-- `docs/` - Architecture and deployment documentation and verification screenshots
-- `Makefile` - Project automation commands
-- `scripts/` - Repository hygiene and compliance checks
-- `tests/` - Automated test suites
+```
+devops-24ESKCS039/
+├── User/               — User-facing React application
+├── admin/              — Admin React application
+├── k8s/                — Kubernetes Deployment and Service manifests
+├── monitoring/         — Prometheus scrape configuration and Grafana dashboard
+├── docs/               — Architecture and verification screenshots
+├── tests/              — Automated test suites
+├── .github/workflows/  — GitHub Actions CI/CD pipeline
+├── Dockerfile          — Multi-stage production container image
+├── docker-compose.yml  — Multi-container local stack
+├── Jenkinsfile         — Jenkins automation pipeline
+├── Makefile            — Project automation tasks
+├── server.js           — Production Express server with /metrics & /health
+└── scripts/            — Repository hygiene checks
+```
 
 ## Milestone 2 (MT2) Implementation
 
 ### 1. Containerization (M5)
-- **Dockerfile**: Multi-stage Docker build separating frontend Vite asset compilation and production Node runtime.
-- **Docker Compose**: Orchestrates `app`, `prometheus`, and `grafana` services with dedicated bridge network and persistent data volumes.
-- **Container Registry**: Automated CI pipeline publishes versioned container images to GitHub Container Registry:
-  `ghcr.io/skit-devops-2026/devops-24ESKCS039:latest`
+- **Dockerfile**: Multi-stage production build in `Dockerfile` that packages dependencies, compiles Vite frontends, and runs an optimized Node.js runtime.
+- **Docker Compose**: `docker-compose.yml` configures the application, Prometheus, and Grafana with a shared bridge network and named persistent volumes.
+- **Container Registry Push**: Automated GitHub Actions CI workflow in `.github/workflows/ci.yml` builds, tests, and publishes container images to GitHub Container Registry (`ghcr.io/skit-devops-2026/devops-24eskcs039`).
 
 ### 2. Deployment and Monitoring (M6)
-- **Deployment**: Live web application deployed and responding to HTTP requests with health check probe.
-- **Prometheus Monitoring**: Scrapes application metrics via `/metrics` every 15 seconds.
-- **Grafana Dashboard**: Tracks the Four Golden Signals:
-  - *Latency*: 95th percentile response time (`http_request_duration_seconds`)
-  - *Traffic*: Request rate per second (`http_requests_total`)
-  - *Errors*: HTTP 5xx error rate
-  - *Saturation*: Resident memory usage (`process_resident_memory_bytes`)
-- **Evidence**: Complete Grafana dashboard JSON model committed to `monitoring/dashboard.json`, and deployment screenshots committed under `docs/`.
+- **Live URL**: https://projectelara-user.onrender.com
+- **Prometheus Scraper**: Configured via `monitoring/prometheus.yml` to scrape `/metrics` every 15s.
+- **Grafana Dashboard**: Tracks the Four Golden Signals in `monitoring/dashboard.json`:
+  - Latency: 95th percentile response duration
+  - Traffic: HTTP request rate
+  - Errors: 5xx error percentage
+  - Saturation: Process resident memory and event loop lag
+- **Evidence**: Deployment and monitoring verification screenshots committed under `docs/`.
 
 ### 3. Kubernetes Orchestration (M7)
-- **Deployment**: Multi-replica pod deployment with rolling update strategy, container resource limits, and HTTP liveness/readiness probes (`k8s/deployment.yaml`).
-- **Service**: NodePort service routing traffic on port 80 to container port 5000 (`k8s/service.yaml`).
-- **Cluster Verification**: Verified running pods under kind/k8s cluster (`docs/k8s-pods.png`).
+- **Deployment**: `k8s/deployment.yaml` with 2 replicas, rolling updates, resource limits, and HTTP probes.
+- **Service**: `k8s/service.yaml` exposing NodePort on port 80.
+- **Cluster Verification**: Verified pod state committed in `docs/k8s-pods.png`.
 
-## Repository
+## Running Locally
 
-https://github.com/amankuntal5008/Project-ELARA
-
-## Quickstart
-
-Run the full stack with Docker Compose:
 ```bash
-docker compose up --build
+docker compose up --build -d
 ```
-Access the services:
-- ELARA Application: http://localhost:5000
-- Prometheus Server: http://localhost:9090
-- Grafana Dashboards: http://localhost:3000 (login: `admin` / `admin`)
+- Web Application: http://localhost:5000
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3000
